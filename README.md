@@ -1,4 +1,4 @@
-# DSA, Algorithms, LeetCode
+# Data Structures, Algorithms & LeetCode
 
 ### Here we follow TDD ( **T**est **D**riven **D**evelopment) approach.
 
@@ -9,6 +9,7 @@ ts-node src/drill/lcm.ts
 ```
 
 Running tests:
+
 ```bash
 // whole project
 pnpm test
