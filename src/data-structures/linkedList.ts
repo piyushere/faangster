@@ -1,12 +1,7 @@
 /* eslint-disable no-param-reassign */
 /* eslint-disable no-useless-constructor */
 // eslint-disable-next-line max-classes-per-file
-export interface IListNode<T> {
-  value: T;
-  next?: IListNode<T>;
-}
-
-export class ListNode<T> implements IListNode<T> {
+class ListNode<T> {
   constructor(
     public value: T,
     public next?: ListNode<T>
@@ -15,27 +10,27 @@ export class ListNode<T> implements IListNode<T> {
 }
 
 class LinkedList<T> {
-  headNode: ListNode<T>;
+  headNode: ListNode<T> | null = null;
 
-  tailNode: ListNode<T>;
+  tailNode: ListNode<T> | null = null;
 
-  constructor(
-    public value: T
-    // eslint-disable-next-line no-empty-function
-  ) {
-    this.headNode = new ListNode(this.value);
-    // initially the tailNode will be pointing to headNode
-    this.tailNode = this.headNode;
+  length = 0;
+
+  constructor(head?: T) {
+    if (head) this.insert(head);
   }
 
-  insert(newNode: ListNode<T>) {
-    let currentNode: ListNode<T> = this.headNode;
-    // eslint-disable-next-line @typescript-eslint/no-this-alias
-    while (currentNode.next) {
-      currentNode = currentNode?.next;
+  insert(element: T, index: number = this.length) {
+    const newNode = new ListNode(element);
+    if (this.headNode) {
+      let currentNode = this.headNode;
+      while (currentNode.next) currentNode = currentNode?.next;
+      currentNode.next = newNode;
+    } else {
+      this.headNode = newNode;
+      // initially the tailNode will be pointing to headNode
+      this.tailNode = this.headNode;
     }
-    currentNode.next = newNode;
-    return this.headNode;
   }
 
   //   remove(index: number) {
@@ -48,23 +43,35 @@ class LinkedList<T> {
   //     else
   //   }
 
-  insertEnd(newNode: ListNode<T>) {
-    this.tailNode.next = newNode;
-    this.tailNode = this.tailNode.next;
+  insertEnd(element: T) {
+    if (!this.tailNode) this.insert(element);
+    else {
+      this.tailNode.next = new ListNode(element);
+      this.tailNode = this.tailNode.next;
+    }
   }
 
-  insertStart(newNode: ListNode<T>) {
-    newNode.next = this.headNode;
-    this.headNode = newNode;
+  insertStart(element: T) {
+    if (!this.headNode) this.insert(element);
+    else {
+      const newNode = new ListNode(element);
+      newNode.next = this.headNode;
+      this.headNode = newNode;
+    }
   }
 
   iterator() {
     let currentNode = this.headNode;
     return function* () {
-      yield currentNode.value;
-      while (currentNode?.next) {
-        yield currentNode?.next.value;
-        currentNode = currentNode.next;
+      // just return undefined if nothing's there
+      // we can also throw an empty list error
+      if (!currentNode) yield;
+      else {
+        yield currentNode.value;
+        while (currentNode?.next) {
+          yield currentNode?.next.value;
+          currentNode = currentNode.next;
+        }
       }
     };
   }
@@ -73,6 +80,7 @@ class LinkedList<T> {
    * reverse the linked list, using recursion
    */
   reverse(node?: ListNode<T>, previousNode?: ListNode<T>) {
+    if (!this.headNode) throw Error('list is empty: Unable to reverse');
     if (node) this.headNode = node;
     const nextNode = this.headNode.next;
     this.headNode.next = previousNode;
@@ -83,6 +91,7 @@ class LinkedList<T> {
    * reverse the linked list, using looping
    */
   reverseLoop() {
+    if (!this.headNode) throw Error('list is empty: Unable to reverse');
     let prevNode: ListNode<T> | undefined;
     let currentNode: ListNode<T> | undefined = this.headNode;
     let nextNode: ListNode<T> | undefined;
@@ -99,6 +108,7 @@ class LinkedList<T> {
    *  Start putting the elements at the start next to the initial last element
    * */
   reverseAlternate() {
+    if (!this.headNode) throw Error('list is empty: Unable to reverse');
     let tailNode = this.headNode;
     while (tailNode.next) {
       tailNode = tailNode.next;
